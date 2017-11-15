@@ -1,0 +1,135 @@
+package com.bcv.kagami;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import com.bcv.kagami.core.databinder.repository.GenericDao;
+import com.bcv.kagami.core.databinder.repository.GenericDaoImpl;
+import com.bcv.kagami.core.validations.exception.custom.CustomException;
+import com.bcv.kagami.modules.model.EmployeeAccountDetails_148;
+import com.bcv.kagami.modules.model.Employee_8;
+import com.bcv.kagami.modules.model.LeaveOpeningBalance_22;
+import com.bcv.kagami.modules.model.PersonalInformation_42;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class OpeningBalance {
+
+	static int igc = 90;
+	static int isubgc = 00;
+	static int isubsubgcounter = 00;
+	static int itmm = 00;
+	static boolean flag = true;
+
+	@Autowired
+	GenericDao genericDao;
+
+	@Autowired
+	GenericDaoImpl GenericDaoImpl;
+
+	// @PostConstruct
+	public void testing() {
+
+		Double author1 = null;
+		File excel = new File("C:\\Users\\husenaiah\\Desktop\\test1.xls");
+		FileInputStream ex = null;
+		Workbook workbook = null;
+		try {
+			ex = new FileInputStream(excel);
+			InputStream inputStream = new FileInputStream("C:\\Users\\husenaiah\\Desktop\\test1.xls");
+			workbook = WorkbookFactory.create(inputStream);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		// for(int z=0;z<=25;z++){
+
+		Sheet sheet = workbook.getSheetAt(1);
+		String sheetname = workbook.getSheetName(1);
+		System.out.println("sheet no       " + 1);
+		System.out.println("sheet name      " + sheetname);
+		int lastrownumber = 0;
+
+		lastrownumber = sheet.getLastRowNum();
+
+		for (int i = 1; i <= lastrownumber; i++) {
+
+			System.out.println("row number       " + i);
+			System.out.println("sheet no       " + 1);
+			System.out.println("sheet name      " + sheetname);
+			HSSFRow row = (HSSFRow) sheet.getRow(i);
+			HSSFCell cell0 = row.getCell(0); // emp no
+			HSSFCell cell2 = row.getCell(1); // firstname
+			HSSFCell cell4 = row.getCell(3); // lastname
+
+			String name = null;
+			try {
+				name = cell0.getStringCellValue();
+			} catch (Exception e) {
+				name = String.valueOf(cell0.getNumericCellValue());
+			}
+
+			String leaveid = null;
+			try {
+				leaveid = cell2.getStringCellValue();
+			} catch (Exception e) {
+				leaveid = String.valueOf(cell2.getNumericCellValue());
+			}
+
+			String LeaveId = leaveid.toString();
+
+			String openingba = null;
+			try {
+				openingba = cell4.getStringCellValue();
+			} catch (Exception e) {
+				openingba = String.valueOf(cell4.getNumericCellValue());
+			}
+
+			Double openingBal = Double.parseDouble(openingba);
+
+			LeaveOpeningBalance_22 leav = new LeaveOpeningBalance_22();
+
+			String emp = "select e from Employee_8 e where employeeno=:empno";
+			Object obj = GenericDaoImpl.getObject(emp, name);
+			Employee_8 empobj = (Employee_8) obj;
+
+			String employeeid = empobj.getId();
+
+			++igc;
+			String p = Integer.toString(igc);
+			// Employee_8 emp=new Employee_8();
+			// emp.setId(p);
+			// emp.setEmployeeNo(name);
+
+			leav.setId(p);
+			leav.setEmployeeId(employeeid);
+			leav.setLeaveTypeId(LeaveId);
+			leav.setOpeningbalance(openingBal);
+			leav.setSubOrganizationId("1");
+			leav.setStatus("open");
+
+			try {
+				Object kk = genericDao.update(leav);
+			} catch (DataIntegrityViolationException | CustomException e) {
+				// TODO Auto-generated catch block
+				continue;
+			}
+
+		}
+
+	}
+
+}
