@@ -1,0 +1,198 @@
+package com.bcv.kagami;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bcv.kagami.core.databinder.repository.GenericDao;
+import com.bcv.kagami.core.utils.db.DBUtils;
+import com.bcv.kagami.core.validations.exception.app.ApplicationSQLException;
+import com.bcv.kagami.core.validations.exception.custom.CustomException;
+import com.bcv.kagami.modules.model.EmployeeAccountDetails_148;
+import com.bcv.kagami.modules.model.Employee_8;
+import com.bcv.kagami.modules.model.OfficialInformation_9;
+import com.bcv.kagami.modules.model.PersonalInformation_42;
+import com.bcv.kagami.runtime.verb.create.repository.CreateDAO;
+import com.bcv.kagami.runtime.verb.create.service.CreateService;
+import com.bcv.kagami.core.databinder.repository.GenericDaoImpl;
+
+
+import lombok.extern.slf4j.Slf4j;
+
+
+
+
+@Service
+@Slf4j
+public class Testmain2 {
+
+	
+	static int igc=200;
+	static int isubgc=500;
+	static int isubsubgcounter=00;
+	static int itmm=00;
+	static boolean flag=true;
+	
+	@Autowired
+	GenericDao genericDao;
+	
+	
+	@Autowired
+	GenericDaoImpl GenericDaoImpl;
+	
+	
+	//@PostConstruct
+	public void testing() {
+
+		// per=empobj.getPersonalInformation_42();
+
+		// Employee_8 emp=new Employee_8();
+		// emp.setId(p);
+		// emp.setEmployeeNo(name);
+
+		/*
+		 * if(per==null){ per=new PersonalInformation_42(); isubgc++; String
+		 * p=Integer.toString(isubgc); if(author1!=null){ per.setId(p);
+		 * per.setAadharNo(author1);
+		 * 
+		 * }
+		 * 
+		 * } else { if(author1!=null){
+		 * 
+		 * per.setAadharNo(author1);
+		 * 
+		 * }
+		 */
+
+		String author1 = null;
+		File excel = new File("C:\\Users\\husenaiah\\Desktop\\test1.xls");
+		FileInputStream ex = null;
+		Workbook workbook = null;
+		EmployeeAccountDetails_148 acc = null;
+		PersonalInformation_42 per = null;
+		try {
+			ex = new FileInputStream(excel);
+			InputStream inputStream = new FileInputStream("C:\\Users\\husenaiah\\Desktop\\test1.xls");
+			workbook = WorkbookFactory.create(inputStream);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		// for(int z=0;z<=25;z++){
+
+		Sheet sheet = workbook.getSheetAt(0);
+		String sheetname = workbook.getSheetName(0);
+		System.out.println("sheet no       " + 0);
+		System.out.println("sheet name      " + sheetname);
+		int lastrownumber = 0;
+
+		lastrownumber = sheet.getLastRowNum();
+
+		for (int i = 1; i <= lastrownumber; i++) {
+
+			System.out.println("row number       " + i);
+			System.out.println("sheet no       " + 1);
+			System.out.println("sheet name      " + sheetname);
+			HSSFRow row = (HSSFRow) sheet.getRow(i);
+			HSSFCell cell0 = row.getCell(0); // emp no
+			HSSFCell cell2 = row.getCell(2); // firstname
+			HSSFCell cell4 = row.getCell(4); // lastname
+			HSSFCell cell6 = row.getCell(6);
+
+			String name = null;
+			try {
+				name = cell0.getStringCellValue();
+			} catch (Exception e) {
+				name = String.valueOf(cell0.getNumericCellValue());
+			}
+
+			String account = null;
+			try {
+				account = cell4.getStringCellValue();
+			} catch (Exception e) {
+				account = String.valueOf(cell4.getNumericCellValue());
+			}
+
+			Double aacounttest = Double.parseDouble(account);
+
+			String author = null;
+			if (cell2 != null && !cell2.toString().isEmpty()) {
+				try {
+					author = cell2.getStringCellValue();
+				} catch (Exception e) {
+					author = String.valueOf(cell2.getNumericCellValue());
+
+				}
+
+				author1 = author.toString();
+			}
+
+			String workid = null;
+			try {
+				workid = cell6.getStringCellValue();
+			} catch (Exception e) {
+				workid = String.valueOf(cell6.getNumericCellValue());
+			}
+
+			String emp = "select e from Employee_8 e where employeeno=:empno";
+			Object obj = GenericDaoImpl.getObject(emp, name);
+			Employee_8 empobj = (Employee_8) obj;
+
+			acc = empobj.getEmployeeAccountDetails_148();
+
+			// acc.setId(p);
+			if (acc == null) {
+
+				acc = new EmployeeAccountDetails_148();
+				++igc;
+				String p = Integer.toString(igc);
+				acc.setId(p);
+				acc.setBankaccountNo(aacounttest);
+				if (author1 != null) {
+					acc.setPfno(author1);
+				}
+
+			} else {
+				acc.setBankaccountNo(aacounttest);
+				if (author1 != null) {
+					acc.setPfno(author1);
+				}
+			}
+
+			empobj.setWorkDayId(workid);
+			// empobj.setPersonalInformation_42(per);
+			empobj.setEmployeeAccountDetails_148(acc);
+
+			try {
+				Object kk = genericDao.update(empobj);
+			} catch (CustomException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+		//}
+		}
+	
