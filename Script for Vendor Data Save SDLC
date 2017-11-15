@@ -1,0 +1,255 @@
+package com.bcv.kagami;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bcv.kagami.core.databinder.repository.GenericDao;
+import com.bcv.kagami.core.utils.db.DBUtils;
+import com.bcv.kagami.core.validations.exception.app.ApplicationSQLException;
+import com.bcv.kagami.core.validations.exception.custom.CustomException;
+import com.bcv.kagami.modules.model.AddressInfo_1491912008790;
+import com.bcv.kagami.modules.model.AddressTypes_1491911975435;
+import com.bcv.kagami.modules.model.City_1491473827404;
+import com.bcv.kagami.modules.model.Country_1491473774758;
+import com.bcv.kagami.modules.model.IsprimaryAddress_1664;
+import com.bcv.kagami.modules.model.PaymentTerms_1491563265064;
+import com.bcv.kagami.modules.model.VendorCategory_1491908617054;
+import com.bcv.kagami.modules.model.VendorTypes_1491908587943;
+import com.bcv.kagami.modules.model.Vendor_1491908670672;
+import com.bcv.kagami.runtime.verb.create.repository.CreateDAO;
+import com.bcv.kagami.runtime.verb.create.service.CreateService;
+import com.bcv.kagami.core.databinder.repository.GenericDaoImpl;
+
+
+import lombok.extern.slf4j.Slf4j;
+
+
+
+
+@Service
+@Slf4j
+public class Testmain2 {
+
+	
+	static int igc=00;
+	static int isubgc=00;
+	static int isubsubgcounter=00;
+	static int itmm=00;
+	static boolean flag=true;
+	
+	@Autowired
+	GenericDao genericDao;
+	
+	
+	@Autowired
+	GenericDaoImpl GenericDaoImpl;
+	
+	
+	//@PostConstruct
+	public void testing(){
+		File excel = new File("C:\\Users\\husenaiah\\Desktop\\uuu.xls");
+		FileInputStream  ex = null;
+		Workbook workbook = null;
+		try {
+			ex = new FileInputStream(excel);
+			InputStream inputStream =
+				      new FileInputStream("C:\\Users\\husenaiah\\Desktop\\SDLC SuppliersData.xls");
+			workbook = WorkbookFactory.create(inputStream);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		Map<String,Vendor_1491908670672> vendor=new HashMap<String,Vendor_1491908670672>();
+		Map<Double,VendorTypes_1491908587943> vendortype=new HashMap<Double,VendorTypes_1491908587943>();
+		Map<String,VendorCategory_1491908617054> vendorcat=new HashMap<String,VendorCategory_1491908617054>();
+		
+		Map<String,City_1491473827404> city=new HashMap<String,City_1491473827404>();
+		Map<String,PaymentTerms_1491563265064> payment=new HashMap<String,PaymentTerms_1491563265064>();
+		Map<String,IsprimaryAddress_1664> isprimary=new HashMap<String,IsprimaryAddress_1664>();
+		Map<String,Country_1491473774758> department=new HashMap<String,Country_1491473774758>();
+		Map<String,AddressTypes_1491911975435> itemdetaildds=new HashMap<String,AddressTypes_1491911975435>();
+		Map<String,AddressInfo_1491912008790> itemsubgroptt=new HashMap<String,AddressInfo_1491912008790>();
+		//for(int z=0;z<=25;z++){
+			
+			
+			Sheet sheet = workbook.getSheetAt(0);
+			String sheetname=	workbook.getSheetName(0);
+			System.out.println("sheet no       "+0);
+			System.out.println("sheet name      "+sheetname);
+			int lastrownumber=0;
+	
+		   lastrownumber=sheet.getLastRowNum();
+		
+		   for(int i=1;i<=lastrownumber;i++){
+			   
+			   System.out.println("row number       "+i);
+				System.out.println("sheet no       "+1);
+				System.out.println("sheet name      "+sheetname);
+				HSSFRow row = (HSSFRow) sheet.getRow(i);
+				HSSFCell cell0=row.getCell(0);      //emp no
+				HSSFCell cell1=row.getCell(1);      //firstname
+				HSSFCell cell2=row.getCell(2);      //lastname
+				
+			
+				HSSFCell cell3=row.getCell(13);     //dataofbirth
+				HSSFCell cell4=row.getCell(14);      //uniqueau
+				HSSFCell cell5=row.getCell(5);     //phone number1
+				
+				HSSFCell cell6=row.getCell(6);       //daofjoining 
+				HSSFCell cell7=row.getCell(7);     //officialemailid
+				
+				HSSFCell cell8=row.getCell(8);   //
+				
+				
+				HSSFCell cell9=row.getCell(9);   //address
+				HSSFCell cell10=row.getCell(10);   //pincode
+				
+				HSSFCell cell11=row.getCell(11);     //pasout year
+				
+				HSSFCell cell12=row.getCell(12);    //name
+				
+			
+			
+				String vcode=null;
+				try{
+					vcode=cell0.getStringCellValue();
+				}catch(Exception e){
+					vcode=String.valueOf(cell0.getNumericCellValue());
+				}
+				
+				//Double gnumber = Double.parseDouble(itemgroupcode);
+				String vname=cell1.getStringCellValue();
+				System.out.println("call1");
+			//	String vtype=cell2.getStringCellValue();
+				System.out.println("call3");
+				
+				
+				
+				
+				String vcatagoty=null;
+				try{
+					vcatagoty=cell3.getStringCellValue();
+				}catch(Exception e){
+					vcatagoty=String.valueOf(cell3.getNumericCellValue());
+				}
+				String vcat[]=vcatagoty.split("\\.");
+				
+				System.out.println("call3");
+				String paymentt=null;
+				try{
+					paymentt=cell4.getStringCellValue();
+				}catch(Exception e){
+					paymentt=String.valueOf(cell4.getNumericCellValue());
+				}
+				String pay[]=paymentt.split("\\.");
+				System.out.println("call4");
+				String addresstype=cell5.getStringCellValue();
+				System.out.println("call5");
+		
+			    String isprimaryvalue=cell6.getStringCellValue();
+				System.out.println("call6");
+				String countrycode=cell7.getStringCellValue();
+				System.out.println("call7");
+				
+				String citycode=cell8.getStringCellValue();
+				System.out.println("call8");
+				
+				Double pincodenumber=cell9.getNumericCellValue();
+				
+				System.out.println("call9");
+				String fff=String.valueOf(pincodenumber);
+				String pincode1[]=fff.split("\\.");
+				//Double pinnumber = Double.parseDouble(pincode1[0]);
+				
+				String contactperson=cell10.getStringCellValue();
+				System.out.println("call10");
+				
+				
+				
+				Double phonenumber=cell11.getNumericCellValue();
+				System.out.println("call11");
+				String mmm=String.valueOf(phonenumber);
+				String phonemu[]=mmm.split("\\.");
+				System.out.println("cell11");
+				
+				
+				String email=cell12.getStringCellValue();
+			
+				
+		    
+				//--------------------------------------------------------------------------------------------
+				//ItemGroup
+				if(!vendor.containsKey(vcode))
+				{
+					
+					
+					igc++;
+					String p=Integer.toString(igc);
+					//itemgroupcode=Double.toString(gnumber);
+					//String a[]=itemgroupcode.split("\\.");
+					Vendor_1491908670672 itemg=new Vendor_1491908670672();
+					
+					VendorTypes_1491908587943 persoinfo=new VendorTypes_1491908587943();
+				
+					
+					
+					VendorCategory_1491908617054 des=new VendorCategory_1491908617054();
+					PaymentTerms_1491563265064 emptypee=new PaymentTerms_1491563265064();
+				
+					 Set<AddressInfo_1491912008790> AddressInfo = new HashSet<>();
+					
+					AddressInfo_1491912008790 off=new AddressInfo_1491912008790();
+					off.setId(p);
+					off.setAddressTypesId("0");
+					off.setIsprimaryAddressId("0");
+					//off.setCityId("9");
+					off.setCountryId("1");
+					off.setContactPerson(contactperson);
+					off.setEmail(email);
+					off.setPincode(Double.parseDouble(pincode1[0]));
+					off.setPhoneNumber(phonemu[0]);
+					AddressInfo.add(off);
+					itemg.setVendorCode(vcode);
+					itemg.setVendorName(vname);
+				    itemg.setVendorTypesId("1");
+					itemg.setVendorCategoryId(vcat[0]);
+					itemg.setPaymentTermsId(pay[0]);
+					itemg.setCountryId("1");
+					itemg.setAddressInfo_1491912008790(AddressInfo);
+				
+					
+					try {
+						Object kk=genericDao.save(itemg);
+					} catch (CustomException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			
+		
+}
+		//}
+		}
+	}
