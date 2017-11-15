@@ -1,0 +1,16 @@
+   public Object getObject(String query,String actualName) {
+        Query q = entityManager.createQuery(query);
+       /* if (parameterMap != null) {
+            for (String key : parameterMap.keySet()) {
+                q.setParameter(key, parameterMap.get(key));
+            }
+        }*/
+        q.setParameter("empno",actualName);
+        List<Object> object = q.getResultList();
+       Object obje= object.get(0);
+       if(obje!=null)
+       {
+    	   return obje;
+       }
+       return null;
+    }
