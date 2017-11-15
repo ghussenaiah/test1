@@ -1,0 +1,160 @@
+package com.bcv.kagami;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bcv.kagami.core.databinder.repository.GenericDao;
+import com.bcv.kagami.core.utils.db.DBUtils;
+import com.bcv.kagami.core.validations.exception.app.ApplicationSQLException;
+import com.bcv.kagami.core.validations.exception.custom.CustomException;
+import com.bcv.kagami.modules.model.Department_1491474154332;
+import com.bcv.kagami.modules.model.Designation_199;
+/*import com.bcv.kagami.modules.model.Employee_204;
+import com.bcv.kagami.modules.model.EmploymentType_203;
+import com.bcv.kagami.modules.model.OfficialInformation_205;
+import com.bcv.kagami.modules.model.PersonalInformation_285;*/
+import com.bcv.kagami.runtime.verb.create.repository.CreateDAO;
+import com.bcv.kagami.runtime.verb.create.service.CreateService;
+import com.bcv.kagami.core.databinder.repository.GenericDaoImpl;
+
+
+import lombok.extern.slf4j.Slf4j;
+
+
+
+
+@Service
+@Slf4j
+public class Testmain2 {
+
+	
+	static int igc=2;
+	static int isubgc=30;
+	static int isubsubgcounter=30;
+	static int itmm=30;
+	static boolean flag=true;
+	
+	@Autowired
+	GenericDao genericDao;
+	
+	
+	@Autowired
+	GenericDaoImpl GenericDaoImpl;
+	
+	
+	//@PostConstruct
+	public void testing(){
+		File excel = new File("C:\\Users\\husenaiah\\Desktop\\uuu.xls");
+		FileInputStream  ex = null;
+		Workbook workbook = null;
+		try {
+			ex = new FileInputStream(excel);
+			InputStream inputStream =
+				      new FileInputStream("C:\\Users\\husenaiah\\Desktop\\Emp Data.xls");
+			workbook = WorkbookFactory.create(inputStream);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		Map<String,Department_1491474154332> department=new HashMap<String,Department_1491474154332>();
+		Map<String,Designation_199> itemdetaildds=new HashMap<String,Designation_199>();
+		
+			
+			Sheet sheet = workbook.getSheetAt(1);
+			String sheetname=	workbook.getSheetName(1);
+			System.out.println("sheet no       "+0);
+			System.out.println("sheet name      "+sheetname);
+			int lastrownumber=0;
+	
+		   lastrownumber=sheet.getLastRowNum();
+		
+		   for(int i=1;i<=lastrownumber;i++){
+			 
+			System.out.println("row number       "+i);
+			System.out.println("sheet no       "+1);
+			System.out.println("sheet name      "+sheetname);
+			HSSFRow row = (HSSFRow) sheet.getRow(i);
+			
+			HSSFCell cell4=row.getCell(0);
+			HSSFCell cell5=row.getCell(1);
+			HSSFCell cell6=row.getCell(2);
+			HSSFCell cell7=row.getCell(3);
+			//HSSFCell cell10=row.getCell(10);
+			HSSFCell cell13=row.getCell(4);
+			HSSFCell cell14=row.getCell(5);
+		
+		
+			String departmentCode=cell4.getStringCellValue();
+			String departmentname=cell5.getStringCellValue();
+			String desigcode=cell6.getStringCellValue();
+			String designame=cell7.getStringCellValue();
+			//String emptype=cell10.getStringCellValue();
+			String empcode=cell13.getStringCellValue();
+			String empname=cell14.getStringCellValue();
+		
+			if(!department.containsKey(departmentCode))
+			{
+				igc++;
+				String p=Integer.toString(igc);
+				Designation_199 des=new Designation_199();
+				Department_1491474154332 dep=new Department_1491474154332();
+				dep.setId(p);
+				dep.setCode(departmentCode);
+				dep.setName(departmentname);
+			
+				try {
+				Object kk=genericDao.save(dep);
+				itemdetaildds.clear();
+				} catch (CustomException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				department.put(departmentCode, dep);
+				
+			}
+			
+			if(!itemdetaildds.containsKey(desigcode))
+			{
+				isubgc++;
+				String parent=Integer.toString(igc);
+				String p=Integer.toString(isubgc);
+				Designation_199 des=new Designation_199();
+				
+				des.setId(p);
+			    des.setCode(desigcode);
+			    des.setName(designame);
+			    des.setDepartmentId(parent);
+			
+				try {
+				Object kk=genericDao.save(des);
+				} catch (CustomException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				itemdetaildds.put(desigcode, des);
+			}
+}
+		
+		}
+	}
+
+
