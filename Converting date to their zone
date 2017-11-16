@@ -1,0 +1,34 @@
+public long getMillisecondsAccordingToZone(String value, String offset, String dataType) {
+
+		String dateFormatString = null;
+		log.info("Inside Simple Block ReaderImpl");
+		log.info("Country Offset" + offset);
+		String canonicalId = offsetZoneIdMap.get(offset);
+		if (canonicalId == null) {
+			canonicalId = "Asia/Kolkata";
+		}
+		log.info("Canonical Id : " + canonicalId);
+
+		if (dataType.equalsIgnoreCase("datetime")) {
+			dateFormatString = "dd-MM-yyyy HH:mm";
+		} else if(dataType.equalsIgnoreCase("date")) {
+			dateFormatString = "dd-MM-yyyy";
+		} else if(dataType.equalsIgnoreCase("time")) {
+			dateFormatString = "HH:mm";
+		} 
+		DateTimeFormatter dfm = DateTimeFormat.forPattern(dateFormatString);
+		
+		dfm.withZone(DateTimeZone.forID(canonicalId));
+		DateTime dateVlaue = dfm.parseDateTime(value.trim());
+		long dateLong = dateVlaue.getMillis();
+		//TimeZone tz = TimeZone.getTimeZone(canonicalId);
+		//long offsetValue = tz.getOffset(dateVlaue.getMillis());
+		//log.info("Date SimpleBlockReaderImpl in milliseconds" + dateLong);
+		//log.info("Country Offset in milliseconds" + offsetValue);
+		//long Milliseconds = dateLong - offsetValue;
+
+		log.info("Date generated: " + dateVlaue.toString());
+		log.info("Date SimpleBlock Reader in milliseconds: " + dateVlaue.getMillis());
+
+		return dateLong;
+	}
