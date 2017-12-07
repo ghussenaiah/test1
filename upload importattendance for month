@@ -174,5 +174,24 @@ import lombok.extern.slf4j.Slf4j;
 	           					}
 	               }
 	       }
+	       
+	         @Transactional(value = "mainTransactionManager")
+    public Object getObject(String query,String actualName) {
+        Query q = entityManager.createQuery(query);
+       /* if (parameterMap != null) {
+            for (String key : parameterMap.keySet()) {
+                q.setParameter(key, parameterMap.get(key));
+            }
+        }*/
+        q.setParameter("empno",actualName);
+        List<Object> object = q.getResultList();
+        if(!object.isEmpty()){
+       Object obje= object.get(0);
+       if(obje!=null)
+       {
+    	   return obje;
+       }}
+       return null;
+    }
 	                     
 
