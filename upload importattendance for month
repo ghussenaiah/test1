@@ -1,0 +1,178 @@
+package com.bcv.kagami;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bcv.kagami.core.databinder.repository.GenericDao;
+import com.bcv.kagami.core.utils.db.DBUtils;
+import com.bcv.kagami.core.validations.exception.app.ApplicationSQLException;
+import com.bcv.kagami.core.validations.exception.custom.CustomException;
+import com.bcv.kagami.modules.model.Employee_8;
+import com.bcv.kagami.modules.model.ImportAttendance_212;
+import com.bcv.kagami.runtime.verb.create.repository.CreateDAO;
+import com.bcv.kagami.runtime.verb.create.service.CreateService;
+import com.bcv.kagami.core.databinder.repository.GenericDaoImpl;
+
+import lombok.extern.slf4j.Slf4j;
+	
+	
+	
+	
+	@Service
+	@Slf4j
+	public class Testmain2 {
+	
+	       
+	       static int igc=50000;
+	       static int isubgc=00;
+	       static int isubsubgcounter=00;
+	       static int itmm=00;
+	       static boolean flag=true;
+	       
+	       @Autowired
+	       GenericDao genericDao;
+	       
+	       
+	       @Autowired
+	       GenericDaoImpl GenericDaoImpl;
+	       
+	       
+	       //@PostConstruct
+	       public void testing(){
+	              File excel = new File("C:\\Users\\husenaiah\\Desktop\\QWERTYUI.xls");
+	              FileInputStream  ex = null;
+	              Workbook workbook = null;
+	              try {
+	                     ex = new FileInputStream(excel);
+	                     InputStream inputStream =
+	                                 new FileInputStream("C:\\Users\\husenaiah\\Desktop\\QWERTYUI.xls");
+	                     workbook = WorkbookFactory.create(inputStream);
+	              } catch (Exception e1) {
+	                     // TODO Auto-generated catch block
+	                     e1.printStackTrace();
+	              }
+	              
+	              Map<Double,Employee_8> itemgropmm=new HashMap<Double,Employee_8>();
+	        
+	                     Sheet sheet = workbook.getSheetAt(0);
+	                     String sheetname=     workbook.getSheetName(0);
+	                     System.out.println("sheet no       "+0);
+	                     System.out.println("sheet name      "+sheetname);
+	                     int lastrownumber=0;
+	                     lastrownumber=sheet.getLastRowNum();
+	                     for(int i=1;i<=lastrownumber;i++){
+	                        
+	                        System.out.println("row number       "+i);
+	                        System.out.println("sheet no       "+1);
+	                        System.out.println("sheet name      "+sheetname);
+	                           HSSFRow row = (HSSFRow) sheet.getRow(i);
+	                           HSSFCell cell0=row.getCell(0);     
+	                       	String intime=null;
+                       		String outtime=null;
+                       		String attendate=null;
+	                           String empname=null;
+	           				try{
+	           					empname=cell0.getStringCellValue();
+	           					}catch(Exception e){
+	           					empname=String.valueOf(cell0.getNumericCellValue());
+	           					}
+	           					String emp = "select e from Employee_8 e where firstname=:empno";
+	           					Object obj = GenericDaoImpl.getObject(emp, empname);
+	           					if(obj!=null){
+	           					Employee_8 empobj = (Employee_8) obj;
+	           					String dateFormatString = "yyyy-MM-dd HH:mm";
+	           					String dateonly="yyyy-MM-dd";
+	                             for(int j=1;j<=30;j++){
+	                            	 if(j==5 ||j==12||j==19||j==26)
+	                            	 {
+	                            		 continue;
+	                            	 }
+	                            	 System.out.println("colum no"+j);
+	                            	 ImportAttendance_212 imp=new ImportAttendance_212();
+	                               HSSFCell present=row.getCell(j); 
+	                               String presentValue=null;
+	                               try{
+	                            	   presentValue=present.getStringCellValue();
+	   	           					}catch(Exception e){
+	   	           					presentValue=String.valueOf(present.getNumericCellValue());
+	   	           					}
+	                               if(presentValue!=null && presentValue.trim().equals("P"))
+	                               { 
+	                            	   igc++;
+	                              if(j>0&&j<10)
+	                            	{
+	                            	 String ffff=String.valueOf(j);
+	                            	  StringBuilder df=new StringBuilder();
+	                            	  df.append("0");
+	                            	  df.append(ffff.toString());
+	                            intime="2017-11-"+df.toString()+" 09:30";
+	  	                        outtime="2017-11-"+df.toString()+" 18:00";
+	  	                       	 attendate="2017-11-"+df.toString()+"";
+	  	                              }
+	                            	  
+	                            	
+	                              else{
+	                             
+	                            	  	intime="2017-11-"+j+" 09:30";
+	                       		outtime="2017-11-"+j+" 18:00";
+	                       		 attendate="2017-11-"+j+"";
+	                              }
+	                       		
+	                       		//String teet="2017-11-"+j+" 09:30";
+	                       		
+	                       		DateTimeFormatter dateonlu = DateTimeFormat.forPattern(dateonly);
+	                       		DateTime attendatesese = dateonlu.parseDateTime(attendate);
+	                       		Date atat = attendatesese.toDate();
+	                       		DateTimeFormatter dfm = DateTimeFormat.forPattern(dateFormatString);
+	                       		DateTime intimedfdf = dfm.parseDateTime(intime);
+	                       		Date inin = intimedfdf.toDate();
+	                       		DateTime outtimewe = dfm.parseDateTime(outtime);
+	                       		Date outout = outtimewe.toDate();
+	                               String p=Integer.toString(igc);
+	                      			imp.setId(p);
+	                      		    imp.setEmployeeno(empobj.getEmployeeNo());
+	                      		    imp.setIntime(inin);
+	                      			imp.setOuttime(outout);
+	                      			imp.setAttenddate(atat);
+	                      			imp.setStatus("Valid");
+	                      		     try {
+                                         Object kk=genericDao.update(imp);
+                                  } catch (CustomException e) {
+                                         // TODO Auto-generated catch block
+                                         e.printStackTrace();
+                                 }
+	                               }
+	                      			
+	                          }
+	                                  
+	                       }
+	           					
+	           					}
+	               }
+	       }
+	                     
+
